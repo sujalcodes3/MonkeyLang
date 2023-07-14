@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"monkeylang/ast"
 	"monkeylang/lexer"
 	"monkeylang/token"
@@ -11,15 +12,27 @@ type Parser struct {
 
 	curToken token.Token
 	peekToken token.Token
+
+	errors []string
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l : l}
+	p := &Parser{l : l, errors: []string{}}
 
 	p.nextToken()
 	p.nextToken()
 
 	return p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType){
+	msg := fmt.Sprintf("expected next token error: expected = {%s} | got = {%s}", t, p.peekToken.Type)
+
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) nextToken() {
@@ -72,7 +85,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper met
 	return stmt
 }
 
-func (p * Parser) curTokenIs(t token.TokenType) bool{
+func (p * Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
 
@@ -80,11 +93,13 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
-func (p * Parser) expectPeek( t token.TokenType) bool {
+func (p * Parser) expectPeek(t token.TokenType) bool {
+
 	if p.peekTokenIs(t) {
 		p.nextToken()
 		return true
 	} else {
+		p.peekError(t) // we add error if we do not have the expected token.
 		return false
 	}
 }
