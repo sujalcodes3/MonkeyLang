@@ -9,12 +9,20 @@ import (
 
 type Parser struct {
 	l *lexer.Lexer
+	errors []string
 
 	curToken token.Token
 	peekToken token.Token
 
-	errors []string
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns map[token.TokenType]infixParseFn
 }
+
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn func(ast.Expression) ast.Expression // this function takes an expression which is on the left side of the operator
+)
+
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l : l, errors: []string{}}
