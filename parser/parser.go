@@ -7,6 +7,18 @@ import (
 	"monkeylang/token"
 )
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS
+	LESSGREATER
+	SUM
+	PRODUCT
+	PREFIX
+	CALL
+)
+
+// a pratt parser will create an associations between token types and functions that will parse the token
 type Parser struct {
 	l *lexer.Lexer
 	errors []string
@@ -23,6 +35,13 @@ type (
 	infixParseFn func(ast.Expression) ast.Expression // this function takes an expression which is on the left side of the operator
 )
 
+func (p * Parser) registerPrefix (tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p * Parser) registerInfix (tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
+}
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l : l, errors: []string{}}
@@ -30,9 +49,16 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 	p.nextToken()
 
+	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+
 	return p
 }
 
+func (p * Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
 func (p *Parser) Errors() []string {
 	return p.errors
 }
@@ -70,10 +96,29 @@ func (p *Parser) parseStatement() ast.Statement { // this is a helper method for
 	case token.RETURN :
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+	stmt.Expression = p.parseExpression(LOWEST)
+	if p.peekTokenIs(token.SEMICOLON) {
+	p.nextToken()
+	}
+	return stmt
+	}
+
+func (p * Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type]
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+
+	return leftExp
+}
 func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper method for the parseStatement method
 	stmt := &ast.LetStatement{Token: p.curToken} // create a new let statement
 
