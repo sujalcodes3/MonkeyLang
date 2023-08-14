@@ -20,6 +20,19 @@ type Expression interface {
 	expressionNode()
 }
 
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (il * IntegerLiteral) expressionNode () {}
+func (il * IntegerLiteral) TokenLiteral() string {
+	return il.Token.Literal
+}
+func (il * IntegerLiteral) String() string {
+	return il.Token.Literal
+}
+
 // Program is our first implementation of the Statement interface
 // Program is a slice of Statement
 type Program struct { // it is also the entry node of our Program
