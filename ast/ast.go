@@ -25,12 +25,33 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il * IntegerLiteral) expressionNode () {}
-func (il * IntegerLiteral) TokenLiteral() string {
+func (il *IntegerLiteral) expressionNode() {}
+func (il *IntegerLiteral) TokenLiteral() string {
 	return il.Token.Literal
 }
-func (il * IntegerLiteral) String() string {
+func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
+}
+
+type PrefixExpression struct {
+	Token    token.Token
+	Operator string
+	Right    Expression
+}
+
+func (pe *PrefixExpression) expressionNode() {}
+func (pe *PrefixExpression) TokenLiteral() string {
+	return pe.Token.Literal
+}
+func (pe *PrefixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
 }
 
 // Program is our first implementation of the Statement interface
@@ -38,7 +59,8 @@ func (il * IntegerLiteral) String() string {
 type Program struct { // it is also the entry node of our Program
 	Statements []Statement
 }
-func(p * Program) String() string{
+
+func (p *Program) String() string {
 	var out bytes.Buffer
 
 	for _, s := range p.Statements {
@@ -59,6 +81,7 @@ type Identifier struct {
 	Token token.Token // the token.IDENT token
 	Value string
 }
+
 func (i *Identifier) String() string {
 	return i.Value
 }
@@ -69,10 +92,11 @@ func (i *Identifier) TokenLiteral() string {
 
 type LetStatement struct {
 	Token token.Token // the token.LET token
-	Name *Identifier
+	Name  *Identifier
 	Value Expression
 }
-func (ls *LetStatement) String() string{
+
+func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(ls.TokenLiteral() + " ")
@@ -87,16 +111,17 @@ func (ls *LetStatement) String() string{
 
 	return out.String()
 }
-func (ls *LetStatement) statementNode(){}
+func (ls *LetStatement) statementNode() {}
 func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
 
 type ReturnStatement struct {
-	Token token.Token // the token.RETURN token
+	Token       token.Token // the token.RETURN token
 	ReturnValue Expression
 }
-func (rs * ReturnStatement) String() string {
+
+func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(rs.TokenLiteral() + "")
@@ -109,24 +134,24 @@ func (rs * ReturnStatement) String() string {
 
 	return out.String()
 }
-func (rs * ReturnStatement) statementNode(){}
-func (rs * ReturnStatement) TokenLiteral() string {
+func (rs *ReturnStatement) statementNode() {}
+func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
 
 type ExpressionStatement struct { // the "statement" keyword only indicates that this is just a wrapper for a standalone expression 'cause our language supports expression statements
-	Token token.Token
+	Token      token.Token
 	Expression Expression
 }
-func (es * ExpressionStatement) String() string {
+
+func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
 	}
 
 	return ""
 }
-func (es *ExpressionStatement) statementNode(){}
+func (es *ExpressionStatement) statementNode() {}
 func (es *ExpressionStatement) TokenLiteral() string {
 	return es.Token.Literal
 }
-
