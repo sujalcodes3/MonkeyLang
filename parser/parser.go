@@ -79,12 +79,6 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
-func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token error: expected = {%s} | got = {%s}", t, p.peekToken.Type)
-
-	p.errors = append(p.errors, msg)
-}
-
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
@@ -123,6 +117,17 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	}
 	return stmt
 }
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type]
+	if prefix == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
+		return nil
+	}
+
+	leftExp := prefix()
+
+	return leftExp
+}
 func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
@@ -136,26 +141,12 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	return lit
 }
-
-func (p *Parser) noPrefixParseFnError(t token.TokenType) {
-	msg := fmt.Sprintf("no prefix parse function for %s found", t)
-	p.errors = append(p.errors, msg)
-}
-func (p *Parser) parseExpression(precedence int) ast.Expression {
-	prefix := p.prefixParseFns[p.curToken.Type]
-	if prefix == nil {
-		p.noPrefixParseFnError(p.curToken.Type)
-		return nil
-	}
-
-	leftExp := prefix()
-
-	return leftExp
-}
 func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper method for the parseStatement method
+
+	// ? The expectPeek method also moves the pointer ahead - keep in mind
 	stmt := &ast.LetStatement{Token: p.curToken} // create a new let statement
 
-	if !p.expectPeek(token.IDENT) { // if the next token is not an identifier
+	if !p.expectPeek(token.IDENT) { // if the next token is not an identifier, then something is wrong in the program
 		return nil
 	}
 
@@ -166,6 +157,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper met
 	}
 
 	// TODO : We're skipping the expressions until we encounter a semicolon
+
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -178,7 +170,7 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	p.nextToken()
 
-	// TODO : We're skipping the expressions until we encounter a semicolon
+	// TODO : We're skipping the expression after the 'return' keyword until we encounter a semicolon
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -203,4 +195,15 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.peekError(t) // we add error if we do not have the expected token.
 		return false
 	}
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token error: expected = {%s} | got = {%s}", t, p.peekToken.Type)
+
+	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
 }

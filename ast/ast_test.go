@@ -6,6 +6,8 @@ import (
 )
 
 func TestString(t *testing.T) {
+	// we are checking the command: 
+	// let myVar = anotherVar
 	program := &Program {
 		Statements: []Statement {
 			&LetStatement {
