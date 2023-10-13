@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	// increases one by one
 	_ int = iota
 	LOWEST
 	EQUALS
