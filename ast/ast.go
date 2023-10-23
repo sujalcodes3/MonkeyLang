@@ -156,9 +156,9 @@ func (es *ExpressionStatement) TokenLiteral() string {
 	return es.Token.Literal
 }
 
-type InfixExpression struct {
+type InfixExpression struct { // fullfils the Expression and Node interfaces.
 	Token    token.Token // the operator token, e.g. +
-	Left     Expression
+	Left     Expression  // only difference from ast.PrefixExpression
 	Operator string
 	Right    Expression
 }
