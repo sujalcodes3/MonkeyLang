@@ -1,1 +1,1 @@
-Review the working of the parser from the beginning.
+Understand the parseExpression function in the ParseProgram function.

@@ -161,11 +161,17 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.l.NextToken()
 }
 
+// The function of the Parser.
 func (p *Parser) ParseProgram() *ast.Program {
+
+	// creating an instance of the program type.
 	program := &ast.Program{} // root node of AST
 	program.Statements = []ast.Statement{}
 
+	// we are parsing the program until we reach the end of the file.
 	for p.curToken.Type != token.EOF {
+
+		// we are parsing the statements and appending them to the program.
 		stmt := p.parseStatement()
 		// NOTE : we removed an if check here which checked if stmt is nil
 		program.Statements = append(program.Statements, stmt)
@@ -199,7 +205,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 
 	if err != nil {
-		msg := fmt.Sprintf("could not parser %q as integet", p.curToken.Literal)
+		msg := fmt.Sprintf("could not parser %q as integer", p.curToken.Literal)
 		p.errors = append(p.errors, msg)
 		return nil
 	}
@@ -209,15 +215,17 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 }
 func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper method for the parseStatement method
 
-	// ? The expectPeek method also moves the pointer ahead - keep in mind
 	stmt := &ast.LetStatement{Token: p.curToken} // create a new let statement
 
+	// ? The expectPeek method also moves the pointer ahead - keep in mind
 	if !p.expectPeek(token.IDENT) { // if the next token is not an identifier, then something is wrong in the program
 		return nil
 	}
 
+	// the name of a statement is an IDENTIFIER.
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal} // set the name of the let statement
 
+	// the next token should be an ASSIGN token, it moves the pointer ahead and checks too, the idea of the expectPeek method is very good.
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
