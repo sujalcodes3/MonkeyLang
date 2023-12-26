@@ -56,14 +56,19 @@ func (p *Parser) peekPrecedence() int {
 	return LOWEST
 }
 func (p *Parser) parseExpression(precedence int) ast.Expression {
+	// we get the prefix function for the current token
 	prefix := p.prefixParseFns[p.curToken.Type]
+
+	// if the prefix function is nil, then we have an error
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
+	// we call the prefix function
 	leftExp := prefix()
 
+	// we loop until we encounter a semicolon or the precedence of the next token is lower than the precedence of the current token
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		infix := p.infixParseFns[p.peekToken.Type]
 
@@ -103,20 +108,42 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 
+	// = something
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
+
+	// 5
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+
+	// !something
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+
+	// -something
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 
+	// something + something
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
+
+	// something - something
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
+
+	// something / something
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
+
+	// something * something
 	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+
+	// something == something
 	p.registerInfix(token.EQ, p.parseInfixExpression)
+
+	// something != something
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
+
+	// something < something
 	p.registerInfix(token.LT, p.parseInfixExpression)
+
+	// something > something
 	p.registerInfix(token.GT, p.parseInfixExpression)
 
 	return p
@@ -205,7 +232,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 
 	if err != nil {
-		msg := fmt.Sprintf("could not parser %q as integer", p.curToken.Literal)
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
 		p.errors = append(p.errors, msg)
 		return nil
 	}
