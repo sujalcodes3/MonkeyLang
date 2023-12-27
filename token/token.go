@@ -2,6 +2,7 @@ package token
 
 type TokenType string
 
+// basic building block of our language.
 type Token struct {
 	Type    TokenType
 	Literal string
@@ -46,6 +47,7 @@ const (
 	EOF     = "EOF"     // End of Line
 )
 
+// map of keywords (parts of language)
 var keywords = map[string]TokenType{
 	"fn":     FUNCTION,
 	"let":    LET,
@@ -56,6 +58,7 @@ var keywords = map[string]TokenType{
 	"return": RETURN,
 }
 
+// looks at the map for possible keywords, or else returns IDENT (identifier)
 func LookupIdent(ident string) TokenType {
 	if tok, ok := keywords[ident]; ok {
 		return tok

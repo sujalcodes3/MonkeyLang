@@ -33,9 +33,10 @@ var precendences = map[token.TokenType]int{
 
 // a pratt parser will create an associations between token types and functions that will parse the token
 type Parser struct {
-	l      *lexer.Lexer
+	l      *lexer.Lexer // takes lexer as an input
 	errors []string
 
+    // reading through the file.
 	curToken  token.Token
 	peekToken token.Token
 

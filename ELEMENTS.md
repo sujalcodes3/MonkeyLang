@@ -18,4 +18,14 @@ let <identifier> = <expression>
     for e.g. : let a = 5; doesn't produce a value but add(5, 5) produces a value.
 
 ## IntegerLiterals 
-    
+    for e.g : 5, 10 etc    
+
+## Lexer
+    The following is the output from the lexer. Our parser traverses through this data to create the ast.
+    >> let x = -1
+
+    {Type:LET Literal:let}
+    {Type:IDENT Literal:x}
+    {Type:= Literal:=}
+    {Type:- Literal:-}
+    {Type:INT Literal:1}

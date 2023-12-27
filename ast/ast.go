@@ -34,9 +34,9 @@ func (il *IntegerLiteral) String() string {
 }
 
 type PrefixExpression struct {
-	Token    token.Token
-	Operator string
-	Right    Expression
+	Token    token.Token // The token in consideration
+	Operator string      // -, ! etc the operator
+	Right    Expression  // the expression to the right
 }
 
 func (pe *PrefixExpression) expressionNode() {}
