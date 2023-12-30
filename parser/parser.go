@@ -121,6 +121,13 @@ func New(l *lexer.Lexer) *Parser {
 	// -something
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
+    // TRUE
+    p.registerPrefix(token.TRUE, p.parseBoolean)
+
+    // FALSE
+    p.registerPrefix(token.FALSE, p.parseBoolean)
+
+
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 
 	// something + something
@@ -241,6 +248,14 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	return lit
 }
+
+// parseBoolean is a helper function for the parseExpression method
+func (p *Parser) parseBoolean() ast.Expression {
+    return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE)} 
+}
+
+
+
 func (p *Parser) parseLetStatement() *ast.LetStatement { // this is a helper method for the parseStatement method
 
 	stmt := &ast.LetStatement{Token: p.curToken} // create a new let statement
