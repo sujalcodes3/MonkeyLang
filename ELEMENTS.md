@@ -29,3 +29,13 @@ let <identifier> = <expression>
     {Type:= Literal:=}
     {Type:- Literal:-}
     {Type:INT Literal:1}
+
+## If-Else Statement Structure
+    if (<condition>) <consequence> else <alternative>
+    it is an expression in monkeylang, i.e. it produces a value.
+
+## Block Statement
+    Block Statements are a series of statements (just like program in Monkey) enclosed by the opening { and closing } 
+
+
+
