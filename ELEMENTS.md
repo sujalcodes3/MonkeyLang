@@ -37,5 +37,8 @@ let <identifier> = <expression>
 ## Block Statement
     Block Statements are a series of statements (just like program in Monkey) enclosed by the opening { and closing } 
 
+## functions structures
+    fn <parameters> <block statements>
+    <parameters> = <<parameter 1>, <parameter 1>, <parameter 1>> 
 
-
+    function literals are Expressions
