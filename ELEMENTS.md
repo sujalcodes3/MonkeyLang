@@ -42,3 +42,8 @@ let <identifier> = <expression>
     <parameters> = <<parameter 1>, <parameter 1>, <parameter 1>> 
 
     function literals are Expressions
+
+## Call Expression
+    <expression>(<comma separated expresssions>)
+
+
