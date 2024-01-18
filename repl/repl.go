@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"monkeylang/evaluator"
 	"monkeylang/lexer"
 	"monkeylang/parser"
 )
@@ -30,15 +31,29 @@ func Start(in io.Reader, out io.Writer) {
             printParserErrors(out, p.Errors())
             continue
         }
+        
+        evaluated := evaluator.Eval(program)
 
-        io.WriteString(out, program.String())
-        io.WriteString(out, "\n")
+        if evaluated != nil {
+            _, err := io.WriteString(out, evaluated.Inspect())
+            if err != nil {
+                fmt.Printf("Error writing the output: %s", err)
+            }
+            _, err =  io.WriteString(out, "\n")
+            if err != nil {
+                fmt.Printf("Error writing the output: %s", err)
+            }
+        }
     }
 }
 
 
 func printParserErrors (out io.Writer, errors []string) {
     for _, msg := range errors {
-        io.WriteString(out, "\t" + msg + "\n")
+        _, err := io.WriteString(out, "\t" + msg + "\n")
+
+        if err != nil {
+            fmt.Printf("Error writing errors to output: %s", err)
+        }
     }
 }
