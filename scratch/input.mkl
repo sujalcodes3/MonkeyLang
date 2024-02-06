@@ -1,0 +1,7 @@
+let a = 5;
+
+let adder = fn(x) {
+        return x + a;
+    };
+
+adder(6)
