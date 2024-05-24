@@ -67,9 +67,18 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch) // normal stuff
 	case '}':
 		tok = newToken(token.RBRACE, l.ch) // normal stuff
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
+	case ':':
+		tok = newToken(token.COLON, l.ch)
 	case 0: // end of file
 		tok.Literal = ""
 		tok.Type = token.EOF
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 	default: // checks if the character is a letter or a digit.
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
@@ -85,6 +94,20 @@ func (l *Lexer) NextToken() token.Token {
 	}
 	l.readChar() // moves to the next character.
 	return tok   // returns the token.
+}
+
+func (l *Lexer) readString() string {
+	position := l.position + 1
+
+	for {
+		l.readChar()
+
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
+	}
+
+	return l.input[position:l.position]
 }
 
 // creates a new token with the given type and literal.

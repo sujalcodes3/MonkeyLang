@@ -1,7 +1,2 @@
-let a = 5;
-
-let adder = fn(x) {
-        return x + a;
-    };
-
-adder(6)
+let people = [{"name": "Alice", "age": 24}, {"name": "Anna", "age": 28}];
+people[0]["name"];
